@@ -3,6 +3,7 @@ package pgxgcp
 import (
 	"context"
 	"net"
+	"os"
 
 	"cloud.google.com/go/cloudsqlconn"
 	"github.com/jackc/pgx/v5"
@@ -12,18 +13,17 @@ import (
 type Connector struct {
 	// Options to configure the GCP session
 	Options []cloudsqlconn.Option
-	// SkipAuth skips the authentication
-	SkipAuth bool
 }
 
 // BeforeConnect is called before a new connection is made. It is passed a copy of the underlying pgx.ConnConfig and
 // will not impact any existing open connections.
 func (x *Connector) BeforeConnect(ctx context.Context, conn *pgx.ConnConfig) error {
-	// skip any authentication
-	if x.SkipAuth {
+	// check if GOOGLE_APPLICATION_CREDENTIAL is set
+	if os.Getenv("GOOGLE_APPLICATION_CREDENTIALS") == "" {
 		return nil
 	}
 
+	// create a new dialer
 	dialer, err := cloudsqlconn.NewDialer(ctx, x.Options...)
 	if err != nil {
 		return err
