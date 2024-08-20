@@ -9,6 +9,8 @@ cloud.google.com/go/cloudsqlconn v1.12.0 h1:XMCISMxdDy6ILnV1LlSv7RVjua6ezXGbxr6R
 cloud.google.com/go/cloudsqlconn v1.12.0/go.mod h1:mwITDdyZVTBICzSWHCgGo8aaB45GUHclhI+xbR0kq2k=
 cloud.google.com/go/compute/metadata v0.5.0 h1:Zr0eK8JbFv6+Wi4ilXAR8FJ3wyNdpxHKJNPos6LTZOY=
 cloud.google.com/go/compute/metadata v0.5.0/go.mod h1:aHnloV2TPI38yx4s9+wAZhHykWvVCfu7hQbF+9CWoiY=
+cloud.google.com/go/datastore v1.17.1 h1:6Me8ugrAOAxssGhSo8im0YSuy4YvYk4mbGvCadAH5aE=
+cloud.google.com/go/datastore v1.17.1/go.mod h1:mtzZ2HcVtz90OVrEXXGDc2pO4NM1kiBQy8YV4qGe0ZM=
 cloud.google.com/go/firestore v1.16.0 h1:YwmDHcyrxVRErWcgxunzEaZxtNbc8QoFYA/JOEwDPgc=
 cloud.google.com/go/firestore v1.16.0/go.mod h1:+22v/7p+WNBSQwdSwP57vz47aZiY+HrDkrOsJNhk7rg=
 cloud.google.com/go/longrunning v0.5.11 h1:Havn1kGjz3whCfoD8dxMLP73Ph5w+ODyZB9RUsDxtGk=

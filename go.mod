@@ -6,6 +6,7 @@ toolchain go1.23.0
 
 require (
 	cloud.google.com/go/cloudsqlconn v1.12.0
+	cloud.google.com/go/datastore v1.17.1
 	cloud.google.com/go/firestore v1.16.0
 	github.com/jackc/pgx/v5 v5.6.0
 	github.com/pgx-contrib/pgxcache v0.0.0-20240818140817-64a76fed9127
