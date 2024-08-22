@@ -2,11 +2,13 @@ package pgxgcp_test
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"time"
 
 	"cloud.google.com/go/datastore"
 	"cloud.google.com/go/firestore"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/pgx-contrib/pgxcache"
 	"github.com/pgx-contrib/pgxgcp"
@@ -22,6 +24,8 @@ func ExampleFirestoreQueryCacher() {
 	if err != nil {
 		panic(err)
 	}
+	// close the connection
+	defer conn.Close()
 
 	// Create a new client
 	client, err := firestore.NewClient(context.TODO(), os.Getenv("GOOGLE_PROJECT_ID"))
@@ -45,10 +49,26 @@ func ExampleFirestoreQueryCacher() {
 		Querier: conn,
 	}
 
-	row := querier.QueryRow(context.TODO(), "SELECT 1")
-	// scan the row
-	if err := row.Scan(&count); err != nil {
+	rows, err := querier.Query(context.TODO(), "SELECT * from customer")
+	if err != nil {
 		panic(err)
+	}
+	// close the rows
+	defer rows.Close()
+
+	// Customer struct must be defined
+	type Customer struct {
+		FirstName string `db:"first_name"`
+		LastName  string `db:"last_name"`
+	}
+
+	for rows.Next() {
+		customer, err := pgx.RowToStructByName[Customer](rows)
+		if err != nil {
+			panic(err)
+		}
+
+		fmt.Println(customer.FirstName)
 	}
 }
 
@@ -62,6 +82,8 @@ func ExampleDatastoreQueryCacher() {
 	if err != nil {
 		panic(err)
 	}
+	// close the connection
+	defer conn.Close()
 
 	// Create a new client
 	client, err := datastore.NewClient(context.TODO(), os.Getenv("GOOGLE_PROJECT_ID"))
@@ -85,9 +107,25 @@ func ExampleDatastoreQueryCacher() {
 		Querier: conn,
 	}
 
-	row := querier.QueryRow(context.TODO(), "SELECT 1")
-	// scan the row
-	if err := row.Scan(&count); err != nil {
+	rows, err := querier.Query(context.TODO(), "SELECT * from customer")
+	if err != nil {
 		panic(err)
+	}
+	// close the rows
+	defer rows.Close()
+
+	// Customer struct must be defined
+	type Customer struct {
+		FirstName string `db:"first_name"`
+		LastName  string `db:"last_name"`
+	}
+
+	for rows.Next() {
+		customer, err := pgx.RowToStructByName[Customer](rows)
+		if err != nil {
+			panic(err)
+		}
+
+		fmt.Println(customer.FirstName)
 	}
 }
