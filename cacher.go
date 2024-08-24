@@ -23,17 +23,10 @@ var _ pgxcache.QueryCacher = &FirestoreQueryCacher{}
 
 // FirestoreQueryCacher implements pgxcache.QueryCacher interface to use Google Firestore.
 type FirestoreQueryCacher struct {
-	client     *firestore.Client
-	collection string
-}
-
-// NewFirestoreQueryCacher creates a new instance of FirestoreQueryCacher backend using Google Firestore client.
-// All rows created in Google Firestore by pgxcache will have stored with table.
-func NewFirestoreQueryCacher(client *firestore.Client, collection string) *FirestoreQueryCacher {
-	return &FirestoreQueryCacher{
-		client:     client,
-		collection: collection,
-	}
+	// Client is the Firestore client.
+	Client *firestore.Client
+	// Collection is the name of the collection in Firestore.
+	Collection string
 }
 
 // Get gets a cache item from Google Firestore. Returns pointer to the item, a boolean
@@ -44,7 +37,7 @@ func (r *FirestoreQueryCacher) Get(ctx context.Context, key *pgxcache.QueryKey) 
 		ID: key.String(),
 	}
 	// get the item from the table
-	document, err := r.client.Collection(r.collection).Doc(row.ID).Get(ctx)
+	document, err := r.Client.Collection(r.Collection).Doc(row.ID).Get(ctx)
 	switch status.Code(err) {
 	case codes.OK:
 		// get the record
@@ -80,13 +73,8 @@ func (r *FirestoreQueryCacher) Set(ctx context.Context, key *pgxcache.QueryKey, 
 		ExpireAt: time.Now().UTC().Add(ttl),
 	}
 
-	_, err = r.client.Collection(r.collection).Doc(row.ID).Set(ctx, row)
+	_, err = r.Client.Collection(r.Collection).Doc(row.ID).Set(ctx, row)
 	return err
-}
-
-// Close closes the FirestoreQueryCacher client.
-func (r *FirestoreQueryCacher) Close() error {
-	return r.client.Close()
 }
 
 // DatastoreQuery represents a record in the dynamodb table.
@@ -100,17 +88,10 @@ var _ pgxcache.QueryCacher = &DatastoreQueryCacher{}
 
 // DatastoreQueryCacher implements pgxcache.QueryCacher interface to use Google Datastore.
 type DatastoreQueryCacher struct {
-	client *datastore.Client
-	kind   string
-}
-
-// NewDatastoreQueryCacher creates a new instance of DatastoreQueryCacher backend using Google Datastore client.
-// All rows created in Google Datastore by pgxcache will have stored with table.
-func NewDatastoreQueryCacher(client *datastore.Client, kind string) *DatastoreQueryCacher {
-	return &DatastoreQueryCacher{
-		client: client,
-		kind:   kind,
-	}
+	// Client is the Datastore client.
+	Client *datastore.Client
+	// Kind is the name of the kind in Datastore.
+	Kind string
 }
 
 // Get gets a cache item from Google Datastore. Returns pointer to the item, a boolean
@@ -121,9 +102,9 @@ func (r *DatastoreQueryCacher) Get(ctx context.Context, key *pgxcache.QueryKey) 
 		ID: key.String(),
 	}
 	// create a new name
-	name := datastore.NameKey(r.kind, row.ID, nil)
+	name := datastore.NameKey(r.Kind, row.ID, nil)
 	// get the item from the table
-	err := r.client.Get(ctx, name, row)
+	err := r.Client.Get(ctx, name, row)
 	switch err {
 	case nil:
 		item := &pgxcache.QueryResult{}
@@ -154,14 +135,9 @@ func (r *DatastoreQueryCacher) Set(ctx context.Context, key *pgxcache.QueryKey, 
 		ExpireAt: time.Now().UTC().Add(ttl),
 	}
 	// create a new name
-	name := datastore.NameKey(r.kind, row.ID, nil)
+	name := datastore.NameKey(r.Kind, row.ID, nil)
 	// set the item into the table
-	_, err = r.client.Put(ctx, name, row)
+	_, err = r.Client.Put(ctx, name, row)
 	// done!
 	return err
-}
-
-// Close closes the FirestoreQueryCacher client.
-func (r *DatastoreQueryCacher) Close() error {
-	return r.client.Close()
 }

@@ -34,7 +34,10 @@ func ExampleFirestoreQueryCacher() {
 	}
 
 	// Create a new cacher
-	cacher := pgxgcp.NewFirestoreQueryCacher(client, "queries")
+	cacher := &pgxgcp.FirestoreQueryCacher{
+		Client:     client,
+		Collection: "queries",
+	}
 
 	// create a new querier
 	querier := &pgxcache.Querier{
@@ -92,7 +95,10 @@ func ExampleDatastoreQueryCacher() {
 	}
 
 	// Create a new cacher
-	cacher := pgxgcp.NewDatastoreQueryCacher(client, "queries")
+	cacher := &pgxgcp.DatastoreQueryCacher{
+		Client: client,
+		Kind:   "queries",
+	}
 
 	// create a new querier
 	querier := &pgxcache.Querier{
