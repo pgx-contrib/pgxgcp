@@ -8,6 +8,7 @@ require (
 	cloud.google.com/go/cloudsqlconn v1.12.0
 	cloud.google.com/go/datastore v1.18.0
 	cloud.google.com/go/firestore v1.16.0
+	cloud.google.com/go/storage v1.43.0
 	github.com/jackc/pgx/v5 v5.6.0
 	github.com/pgx-contrib/pgxcache v0.0.0-20240818140817-64a76fed9127
 	github.com/vmihailenco/msgpack/v4 v4.3.13
@@ -19,6 +20,7 @@ require (
 	cloud.google.com/go/auth v0.9.0 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.4 // indirect
 	cloud.google.com/go/compute/metadata v0.5.0 // indirect
+	cloud.google.com/go/iam v1.1.13 // indirect
 	cloud.google.com/go/longrunning v0.6.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/dgraph-io/ristretto v0.1.1 // indirect

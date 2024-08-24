@@ -6,6 +6,7 @@ import (
 
 	"cloud.google.com/go/datastore"
 	"cloud.google.com/go/firestore"
+	"cloud.google.com/go/storage"
 	"github.com/pgx-contrib/pgxcache"
 	"github.com/vmihailenco/msgpack/v4"
 	"google.golang.org/grpc/codes"
@@ -140,4 +141,67 @@ func (r *DatastoreQueryCacher) Set(ctx context.Context, key *pgxcache.QueryKey, 
 	_, err = r.Client.Put(ctx, name, row)
 	// done!
 	return err
+}
+
+var _ pgxcache.QueryCacher = &StorageQueryCacher{}
+
+// StorageQueryCacher implements pgxcache.QueryCacher interface to use Google Cloud Storage.
+type StorageQueryCacher struct {
+	// Client to interact with S3
+	Client *storage.Client
+	// Bucket name in S3
+	Bucket string
+}
+
+// Get implements pgxcache.QueryCacher.
+func (r *StorageQueryCacher) Get(ctx context.Context, key *pgxcache.QueryKey) (*pgxcache.QueryResult, error) {
+	// create a new entity
+	entity := r.Client.Bucket(r.Bucket).Object(key.String())
+
+	// check the expiration
+	attr, err := entity.Attrs(ctx)
+	switch err {
+	case nil:
+		if attr.CustomTime.Before(time.Now().UTC()) {
+			return nil, nil
+		}
+	case storage.ErrObjectNotExist:
+		return nil, nil
+	default:
+		return nil, err
+	}
+
+	// create a new writer
+	reader, err := entity.NewReader(ctx)
+	switch err {
+	case nil:
+		defer reader.Close()
+
+		item := &pgxcache.QueryResult{}
+		// unmarshal the result
+		if err := msgpack.NewDecoder(reader).Decode(item); err != nil {
+			return nil, err
+		}
+		// done!
+		return item, nil
+	case storage.ErrObjectNotExist:
+		return nil, nil
+	default:
+		return nil, err
+	}
+}
+
+// Set implements pgxcache.QueryCacher.
+func (r *StorageQueryCacher) Set(ctx context.Context, key *pgxcache.QueryKey, item *pgxcache.QueryResult, ttl time.Duration) error {
+	// create a new entity
+	entity := r.Client.Bucket(r.Bucket).Object(key.String())
+	// create a new writer
+	writer := entity.NewWriter(ctx)
+	// set the retention policy
+	writer.ObjectAttrs.CustomTime = time.Now().UTC().Add(ttl)
+	// close the writer
+	defer writer.Close()
+
+	// encode the item
+	return msgpack.NewEncoder(writer).Encode(item)
 }
