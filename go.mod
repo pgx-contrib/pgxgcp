@@ -6,7 +6,7 @@ toolchain go1.23.0
 
 require (
 	cloud.google.com/go/cloudsqlconn v1.12.0
-	cloud.google.com/go/datastore v1.18.0
+	cloud.google.com/go/datastore v1.19.0
 	cloud.google.com/go/firestore v1.16.0
 	cloud.google.com/go/storage v1.43.0
 	github.com/jackc/pgx/v5 v5.6.0
@@ -57,7 +57,7 @@ require (
 	golang.org/x/time v0.6.0 // indirect
 	google.golang.org/api v0.193.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
-	google.golang.org/genproto v0.0.0-20240820151423-278611b39280 // indirect
+	google.golang.org/genproto v0.0.0-20240822170219-fc7c04adadcd // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20240820151423-278611b39280 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240820151423-278611b39280 // indirect
 	google.golang.org/protobuf v1.34.2 // indirect
