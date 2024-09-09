@@ -9,7 +9,7 @@ require (
 	cloud.google.com/go/datastore v1.19.0
 	cloud.google.com/go/firestore v1.16.0
 	cloud.google.com/go/storage v1.43.0
-	github.com/jackc/pgx/v5 v5.6.0
+	github.com/jackc/pgx/v5 v5.7.0
 	github.com/pgx-contrib/pgxcache v0.0.0-20240818140817-64a76fed9127
 	github.com/vmihailenco/msgpack/v4 v4.3.13
 	google.golang.org/grpc v1.66.0
