@@ -2,13 +2,13 @@ package pgxgcp
 
 import (
 	"context"
+	"io"
 	"time"
 
 	"cloud.google.com/go/datastore"
 	"cloud.google.com/go/firestore"
 	"cloud.google.com/go/storage"
 	"github.com/pgx-contrib/pgxcache"
-	"github.com/vmihailenco/msgpack/v4"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -48,7 +48,7 @@ func (r *FirestoreQueryCacher) Get(ctx context.Context, key *pgxcache.QueryKey) 
 
 		item := &pgxcache.QueryResult{}
 		// unmarshal the result
-		if err := msgpack.Unmarshal(row.Data, item); err != nil {
+		if err := item.UnmarshalText(row.Data); err != nil {
 			return nil, err
 		}
 		return item, nil
@@ -62,7 +62,7 @@ func (r *FirestoreQueryCacher) Get(ctx context.Context, key *pgxcache.QueryKey) 
 // Set sets the given item into Google Firestore with provided TTL duration.
 func (r *FirestoreQueryCacher) Set(ctx context.Context, key *pgxcache.QueryKey, item *pgxcache.QueryResult, ttl time.Duration) error {
 	// marshal the item
-	data, err := msgpack.Marshal(item)
+	data, err := item.MarshalText()
 	if err != nil {
 		return err
 	}
@@ -76,6 +76,12 @@ func (r *FirestoreQueryCacher) Set(ctx context.Context, key *pgxcache.QueryKey, 
 
 	_, err = r.Client.Collection(r.Collection).Doc(row.ID).Set(ctx, row)
 	return err
+}
+
+// Reset implements pgxcache.QueryCacher.
+func (r *FirestoreQueryCacher) Reset(context.Context) error {
+	// TODO: implement this method
+	return nil
 }
 
 // DatastoreQuery represents a record in the dynamodb table.
@@ -110,7 +116,7 @@ func (r *DatastoreQueryCacher) Get(ctx context.Context, key *pgxcache.QueryKey) 
 	case nil:
 		item := &pgxcache.QueryResult{}
 		// unmarshal the result
-		if err := msgpack.Unmarshal(row.Data, item); err != nil {
+		if err := item.UnmarshalText(row.Data); err != nil {
 			return nil, err
 		}
 		return item, nil
@@ -124,7 +130,7 @@ func (r *DatastoreQueryCacher) Get(ctx context.Context, key *pgxcache.QueryKey) 
 // Set sets the given item into Google Datastore with provided TTL duration.
 func (r *DatastoreQueryCacher) Set(ctx context.Context, key *pgxcache.QueryKey, item *pgxcache.QueryResult, ttl time.Duration) error {
 	// marshal the item
-	data, err := msgpack.Marshal(item)
+	data, err := item.MarshalText()
 	if err != nil {
 		return err
 	}
@@ -141,6 +147,12 @@ func (r *DatastoreQueryCacher) Set(ctx context.Context, key *pgxcache.QueryKey, 
 	_, err = r.Client.Put(ctx, name, row)
 	// done!
 	return err
+}
+
+// Reset implements pgxcache.QueryCacher.
+func (r *DatastoreQueryCacher) Reset(context.Context) error {
+	// TODO: implement this method
+	return nil
 }
 
 var _ pgxcache.QueryCacher = &StorageQueryCacher{}
@@ -176,10 +188,15 @@ func (r *StorageQueryCacher) Get(ctx context.Context, key *pgxcache.QueryKey) (*
 	switch err {
 	case nil:
 		defer reader.Close()
+		// read the data
+		data, err := io.ReadAll(reader)
+		if err != nil {
+			return nil, err
+		}
 
 		item := &pgxcache.QueryResult{}
 		// unmarshal the result
-		if err := msgpack.NewDecoder(reader).Decode(item); err != nil {
+		if err := item.UnmarshalText(data); err != nil {
 			return nil, err
 		}
 		// done!
@@ -198,10 +215,21 @@ func (r *StorageQueryCacher) Set(ctx context.Context, key *pgxcache.QueryKey, it
 	// create a new writer
 	writer := entity.NewWriter(ctx)
 	// set the retention policy
-	writer.ObjectAttrs.CustomTime = time.Now().UTC().Add(ttl)
+	writer.CustomTime = time.Now().UTC().Add(ttl)
 	// close the writer
 	defer writer.Close()
 
-	// encode the item
-	return msgpack.NewEncoder(writer).Encode(item)
+	data, err := item.MarshalText()
+	if err != nil {
+		return err
+	}
+
+	_, err = writer.Write(data)
+	return err
+}
+
+// Reset implements pgxcache.QueryCacher.
+func (r *StorageQueryCacher) Reset(context.Context) error {
+	// TODO: implement this method
+	return nil
 }
