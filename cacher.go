@@ -32,7 +32,7 @@ type FirestoreQueryCacher struct {
 
 // Get gets a cache item from Google Firestore. Returns pointer to the item, a boolean
 // which represents whether key exists or not and an error.
-func (r *FirestoreQueryCacher) Get(ctx context.Context, key *pgxcache.QueryKey) (*pgxcache.QueryResult, error) {
+func (r *FirestoreQueryCacher) Get(ctx context.Context, key *pgxcache.QueryKey) (*pgxcache.QueryItem, error) {
 	// create a row
 	row := &FirestoreQuery{
 		ID: key.String(),
@@ -46,7 +46,7 @@ func (r *FirestoreQueryCacher) Get(ctx context.Context, key *pgxcache.QueryKey) 
 			return nil, err
 		}
 
-		item := &pgxcache.QueryResult{}
+		item := &pgxcache.QueryItem{}
 		// unmarshal the result
 		if err := item.UnmarshalText(row.Data); err != nil {
 			return nil, err
@@ -60,7 +60,7 @@ func (r *FirestoreQueryCacher) Get(ctx context.Context, key *pgxcache.QueryKey) 
 }
 
 // Set sets the given item into Google Firestore with provided TTL duration.
-func (r *FirestoreQueryCacher) Set(ctx context.Context, key *pgxcache.QueryKey, item *pgxcache.QueryResult, ttl time.Duration) error {
+func (r *FirestoreQueryCacher) Set(ctx context.Context, key *pgxcache.QueryKey, item *pgxcache.QueryItem, ttl time.Duration) error {
 	// marshal the item
 	data, err := item.MarshalText()
 	if err != nil {
@@ -103,7 +103,7 @@ type DatastoreQueryCacher struct {
 
 // Get gets a cache item from Google Datastore. Returns pointer to the item, a boolean
 // which represents whether key exists or not and an error.
-func (r *DatastoreQueryCacher) Get(ctx context.Context, key *pgxcache.QueryKey) (*pgxcache.QueryResult, error) {
+func (r *DatastoreQueryCacher) Get(ctx context.Context, key *pgxcache.QueryKey) (*pgxcache.QueryItem, error) {
 	// get the item from the collection
 	row := &DatastoreQuery{
 		ID: key.String(),
@@ -114,7 +114,7 @@ func (r *DatastoreQueryCacher) Get(ctx context.Context, key *pgxcache.QueryKey) 
 	err := r.Client.Get(ctx, name, row)
 	switch err {
 	case nil:
-		item := &pgxcache.QueryResult{}
+		item := &pgxcache.QueryItem{}
 		// unmarshal the result
 		if err := item.UnmarshalText(row.Data); err != nil {
 			return nil, err
@@ -128,7 +128,7 @@ func (r *DatastoreQueryCacher) Get(ctx context.Context, key *pgxcache.QueryKey) 
 }
 
 // Set sets the given item into Google Datastore with provided TTL duration.
-func (r *DatastoreQueryCacher) Set(ctx context.Context, key *pgxcache.QueryKey, item *pgxcache.QueryResult, ttl time.Duration) error {
+func (r *DatastoreQueryCacher) Set(ctx context.Context, key *pgxcache.QueryKey, item *pgxcache.QueryItem, ttl time.Duration) error {
 	// marshal the item
 	data, err := item.MarshalText()
 	if err != nil {
@@ -166,7 +166,7 @@ type StorageQueryCacher struct {
 }
 
 // Get implements pgxcache.QueryCacher.
-func (r *StorageQueryCacher) Get(ctx context.Context, key *pgxcache.QueryKey) (*pgxcache.QueryResult, error) {
+func (r *StorageQueryCacher) Get(ctx context.Context, key *pgxcache.QueryKey) (*pgxcache.QueryItem, error) {
 	// create a new entity
 	entity := r.Client.Bucket(r.Bucket).Object(key.String())
 
@@ -194,7 +194,7 @@ func (r *StorageQueryCacher) Get(ctx context.Context, key *pgxcache.QueryKey) (*
 			return nil, err
 		}
 
-		item := &pgxcache.QueryResult{}
+		item := &pgxcache.QueryItem{}
 		// unmarshal the result
 		if err := item.UnmarshalText(data); err != nil {
 			return nil, err
@@ -209,7 +209,7 @@ func (r *StorageQueryCacher) Get(ctx context.Context, key *pgxcache.QueryKey) (*
 }
 
 // Set implements pgxcache.QueryCacher.
-func (r *StorageQueryCacher) Set(ctx context.Context, key *pgxcache.QueryKey, item *pgxcache.QueryResult, ttl time.Duration) error {
+func (r *StorageQueryCacher) Set(ctx context.Context, key *pgxcache.QueryKey, item *pgxcache.QueryItem, ttl time.Duration) error {
 	// create a new entity
 	entity := r.Client.Bucket(r.Bucket).Object(key.String())
 	// create a new writer
