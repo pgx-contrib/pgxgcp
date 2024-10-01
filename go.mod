@@ -11,7 +11,7 @@ require (
 	cloud.google.com/go/storage v1.43.0
 	github.com/jackc/pgx/v5 v5.7.1
 	github.com/pgx-contrib/pgxcache v0.0.0-20240930030356-0d1c9167cd6c
-	google.golang.org/grpc v1.67.0
+	google.golang.org/grpc v1.67.1
 )
 
 require (
