@@ -11,8 +11,19 @@ import (
 
 // Connector connects to a Cloud SQL instance using the Cloud SQL Proxy.
 type Connector struct {
-	// Options to configure the GCP session
-	Options []cloudsqlconn.Option
+	// dialer is the underlying dialer used to connect to the Cloud SQL instance.
+	dialer *cloudsqlconn.Dialer
+}
+
+// Connect creates a new Connector using the provided options.
+func Connect(ctx context.Context, options ...cloudsqlconn.Option) (*Connector, error) {
+	// create a new dialer
+	dialer, err := cloudsqlconn.NewDialer(ctx, options...)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Connector{dialer: dialer}, nil
 }
 
 // BeforeConnect is called before a new connection is made. It is passed a copy of the underlying pgx.ConnConfig and
@@ -23,15 +34,9 @@ func (x *Connector) BeforeConnect(ctx context.Context, conn *pgx.ConnConfig) err
 		return nil
 	}
 
-	// create a new dialer
-	dialer, err := cloudsqlconn.NewDialer(ctx, x.Options...)
-	if err != nil {
-		return err
-	}
-
 	conn.DialFunc = func(ctx context.Context, _ string, _ string) (net.Conn, error) {
 		// we are considering the host name
-		return dialer.Dial(ctx, conn.Host)
+		return x.dialer.Dial(ctx, conn.Host)
 	}
 
 	return nil
