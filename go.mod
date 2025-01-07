@@ -7,7 +7,7 @@ toolchain go1.23.2
 require (
 	cloud.google.com/go/cloudsqlconn v1.13.2
 	cloud.google.com/go/datastore v1.20.0
-	cloud.google.com/go/firestore v1.17.0
+	cloud.google.com/go/firestore v1.18.0
 	cloud.google.com/go/storage v1.49.0
 	github.com/jackc/pgx/v5 v5.7.2
 	github.com/pgx-contrib/pgxcache v0.0.0-20241030071949-0f8c0f2ebc7e
@@ -16,7 +16,7 @@ require (
 
 require (
 	cel.dev/expr v0.18.0 // indirect
-	cloud.google.com/go v0.116.0 // indirect
+	cloud.google.com/go v0.117.0 // indirect
 	cloud.google.com/go/auth v0.13.0 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.6 // indirect
 	cloud.google.com/go/compute/metadata v0.6.0 // indirect
