@@ -8,7 +8,7 @@ require (
 	cloud.google.com/go/cloudsqlconn v1.13.2
 	cloud.google.com/go/datastore v1.20.0
 	cloud.google.com/go/firestore v1.18.0
-	cloud.google.com/go/storage v1.49.0
+	cloud.google.com/go/storage v1.50.0
 	github.com/jackc/pgx/v5 v5.7.2
 	github.com/pgx-contrib/pgxcache v0.0.0-20241030071949-0f8c0f2ebc7e
 	google.golang.org/grpc v1.68.1
