@@ -3,7 +3,6 @@ package pgxgcp
 import (
 	"context"
 	"net"
-	"os"
 
 	"cloud.google.com/go/cloudsqlconn"
 	"github.com/jackc/pgx/v5"
@@ -11,8 +10,8 @@ import (
 
 // Connector connects to a Cloud SQL instance using the Cloud SQL Proxy.
 type Connector struct {
-	// dialer is the underlying dialer used to connect to the Cloud SQL instance.
-	dialer *cloudsqlconn.Dialer
+	// Dialer is the underlying dialer used to connect to the Cloud SQL instance.
+	Dialer *cloudsqlconn.Dialer
 }
 
 // Connect creates a new Connector using the provided options.
@@ -23,20 +22,20 @@ func Connect(ctx context.Context, options ...cloudsqlconn.Option) (*Connector, e
 		return nil, err
 	}
 
-	return &Connector{dialer: dialer}, nil
+	return &Connector{Dialer: dialer}, nil
+}
+
+// Close closes the connector and releases all resources held by the underlying dialer.
+func (x *Connector) Close() error {
+	return x.Dialer.Close()
 }
 
 // BeforeConnect is called before a new connection is made. It is passed a copy of the underlying pgx.ConnConfig and
 // will not impact any existing open connections.
 func (x *Connector) BeforeConnect(ctx context.Context, conn *pgx.ConnConfig) error {
-	// check if GOOGLE_APPLICATION_CREDENTIAL is set
-	if os.Getenv("GOOGLE_APPLICATION_CREDENTIALS") == "" {
-		return nil
-	}
-
 	conn.DialFunc = func(ctx context.Context, _ string, _ string) (net.Conn, error) {
-		// we are considering the host name
-		return x.dialer.Dial(ctx, conn.Host)
+		// use the instance name from the host field
+		return x.Dialer.Dial(ctx, conn.Host)
 	}
 
 	return nil

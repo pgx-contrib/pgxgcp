@@ -2,54 +2,76 @@ package pgxgcp_test
 
 import (
 	"context"
-	"fmt"
 	"os"
 
 	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgxpool"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 	"github.com/pgx-contrib/pgxgcp"
 )
 
-func ExampleConnector() {
-	config, err := pgxpool.ParseConfig(os.Getenv("PGX_DATABASE_URL"))
-	if err != nil {
-		panic(err)
-	}
+var _ = Describe("Connector", func() {
+	var ctx context.Context
 
-	ctx := context.TODO()
-	// Create a new pgxgcp.Connector
-	connector, err := pgxgcp.Connect(ctx)
-	if err != nil {
-		panic(err)
-	}
+	BeforeEach(func() {
+		ctx = context.Background()
+	})
 
-	// Set BeforeConnect hook to pgxaws.BeforeConnect
-	config.BeforeConnect = connector.BeforeConnect
+	// -------------------------------------------------------------------------
+	Describe("BeforeConnect", func() {
+		It("sets DialFunc on the conn config", func() {
+			connector := &pgxgcp.Connector{}
 
-	// Create a new pgxpool with the config
-	conn, err := pgxpool.NewWithConfig(ctx, config)
-	if err != nil {
-		panic(err)
-	}
+			conn := &pgx.ConnConfig{}
+			conn.Host = "project:region:instance"
 
-	rows, err := conn.Query(ctx, "SELECT * from organization")
-	if err != nil {
-		panic(err)
-	}
-	// close the rows
-	defer rows.Close()
+			Expect(connector.BeforeConnect(ctx, conn)).To(Succeed())
+			Expect(conn.DialFunc).NotTo(BeNil())
+		})
 
-	// Organization struct must be defined
-	type Organization struct {
-		Name string `db:"name"`
-	}
+		It("always returns nil", func() {
+			connector := &pgxgcp.Connector{}
 
-	for rows.Next() {
-		organization, err := pgx.RowToStructByName[Organization](rows)
-		if err != nil {
-			panic(err)
-		}
+			conn := &pgx.ConnConfig{}
+			Expect(connector.BeforeConnect(ctx, conn)).To(Succeed())
+		})
+	})
 
-		fmt.Println(organization.Name)
-	}
-}
+	// -------------------------------------------------------------------------
+	Describe("Integration", Ordered, func() {
+		var connector *pgxgcp.Connector
+
+		BeforeAll(func() {
+			if os.Getenv("PGXGCP_CLOUD_SQL_INSTANCE") == "" {
+				Skip("PGXGCP_CLOUD_SQL_INSTANCE not set")
+			}
+
+			var err error
+			connector, err = pgxgcp.Connect(ctx)
+			Expect(err).NotTo(HaveOccurred())
+		})
+
+		AfterAll(func() {
+			if connector != nil {
+				Expect(connector.Close()).To(Succeed())
+			}
+		})
+
+		It("Connect returns a Connector with a non-nil Dialer", func() {
+			Expect(connector.Dialer).NotTo(BeNil())
+		})
+
+		It("BeforeConnect sets DialFunc for the Cloud SQL instance", func() {
+			conn := &pgx.ConnConfig{}
+			conn.Host = os.Getenv("PGXGCP_CLOUD_SQL_INSTANCE")
+
+			Expect(connector.BeforeConnect(ctx, conn)).To(Succeed())
+			Expect(conn.DialFunc).NotTo(BeNil())
+		})
+
+		It("Close succeeds without error", func() {
+			Expect(connector.Close()).To(Succeed())
+			connector = nil
+		})
+	})
+})

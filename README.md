@@ -168,14 +168,22 @@ The project uses [Nix](https://nixos.org/) for reproducible development environm
 
 ```bash
 nix develop
-go build ./...
+go tool ginkgo run -r --race
 ```
 
 **With Dev Containers:**
 
 Open the repository in VS Code or GitHub Codespaces — the devcontainer will configure the environment automatically.
 
-Note: integration tests require real GCP infrastructure (Cloud SQL/Firestore/Datastore/Storage). The build can be verified locally without GCP credentials using `go build ./...`.
+Integration tests require real GCP infrastructure and are guarded by environment variables — they are skipped automatically when the variables are not set:
+
+| Variable | Used by |
+|----------|---------|
+| `PGXGCP_CLOUD_SQL_INSTANCE` | `Connector` (e.g. `project:region:instance`) |
+| `GOOGLE_PROJECT_ID` | `FirestoreQueryCacher`, `DatastoreQueryCacher` |
+| `PGXGCP_FIRESTORE_COLLECTION` | `FirestoreQueryCacher` |
+| `PGXGCP_DATASTORE_KIND` | `DatastoreQueryCacher` |
+| `PGXGCP_STORAGE_BUCKET` | `StorageQueryCacher` |
 
 ## License
 

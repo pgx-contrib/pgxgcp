@@ -29,8 +29,8 @@ jobs:
         with:
           use-flakehub: false
 
-      - name: Build
-        run: nix develop --command go build ./...
+      - name: Run Tests
+        run: nix develop --command go tool ginkgo run -r --race
 
   release:
     needs: build
