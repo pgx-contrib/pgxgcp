@@ -5,7 +5,7 @@ go 1.25.7
 require (
 	cloud.google.com/go/cloudsqlconn v1.20.2
 	cloud.google.com/go/datastore v1.22.0
-	cloud.google.com/go/firestore v1.21.0
+	cloud.google.com/go/firestore v1.22.0
 	cloud.google.com/go/storage v1.62.1
 	github.com/jackc/pgx/v5 v5.9.1
 	github.com/onsi/ginkgo/v2 v2.28.1
