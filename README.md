@@ -1,6 +1,6 @@
 # pgxgcp
 
-[![CI](https://github.com/pgx-contrib/pgxgcp/actions/workflows/ci.yaml/badge.svg)](https://github.com/pgx-contrib/pgxgcp/actions/workflows/ci.yaml)
+[![CI](https://github.com/pgx-contrib/pgxgcp/actions/workflows/ci.yml/badge.svg)](https://github.com/pgx-contrib/pgxgcp/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/pgx-contrib/pgxgcp)](https://github.com/pgx-contrib/pgxgcp/releases)
 [![Go Reference](https://pkg.go.dev/badge/github.com/pgx-contrib/pgxgcp.svg)](https://pkg.go.dev/github.com/pgx-contrib/pgxgcp)
 [![License](https://img.shields.io/github/license/pgx-contrib/pgxgcp)](LICENSE)
