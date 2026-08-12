@@ -3,9 +3,9 @@ module github.com/pgx-contrib/pgxgcp
 go 1.25.8
 
 require (
-	cloud.google.com/go/cloudsqlconn v1.23.0
+	cloud.google.com/go/cloudsqlconn v1.24.0
 	cloud.google.com/go/datastore v1.26.0
-	cloud.google.com/go/firestore v1.24.0
+	cloud.google.com/go/firestore v1.25.0
 	cloud.google.com/go/storage v1.64.0
 	github.com/jackc/pgx/v5 v5.10.0
 	github.com/onsi/ginkgo/v2 v2.32.0
