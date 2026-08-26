@@ -3,15 +3,15 @@ module github.com/pgx-contrib/pgxgcp
 go 1.25.8
 
 require (
-	cloud.google.com/go/cloudsqlconn v1.25.0
+	cloud.google.com/go/cloudsqlconn v1.25.1
 	cloud.google.com/go/datastore v1.26.0
 	cloud.google.com/go/firestore v1.25.0
-	cloud.google.com/go/storage v1.64.0
+	cloud.google.com/go/storage v1.65.0
 	github.com/jackc/pgx/v5 v5.10.0
 	github.com/onsi/ginkgo/v2 v2.32.1
 	github.com/onsi/gomega v1.42.1
 	github.com/pgx-contrib/pgxcache v0.0.0-20260410020444-2c456fcd21ee
-	google.golang.org/grpc v1.83.0
+	google.golang.org/grpc v1.83.1
 )
 
 require (
