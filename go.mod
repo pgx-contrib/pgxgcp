@@ -8,7 +8,7 @@ require (
 	cloud.google.com/go/firestore v1.26.0
 	cloud.google.com/go/storage v1.69.0
 	github.com/jackc/pgx/v5 v5.11.0
-	github.com/onsi/ginkgo/v2 v2.33.0
+	github.com/onsi/ginkgo/v2 v2.33.1
 	github.com/onsi/gomega v1.44.0
 	github.com/pgx-contrib/pgxcache v0.0.0-20261005044121-17cc5b7f8dc7
 	google.golang.org/grpc v1.84.0
