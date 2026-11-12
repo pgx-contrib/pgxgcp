@@ -10,7 +10,7 @@ require (
 	github.com/jackc/pgx/v5 v5.12.0
 	github.com/onsi/ginkgo/v2 v2.34.0
 	github.com/onsi/gomega v1.44.0
-	github.com/pgx-contrib/pgxcache v0.0.0-20261005044121-17cc5b7f8dc7
+	github.com/pgx-contrib/pgxcache v0.0.0-20261110055155-325260075930
 	google.golang.org/grpc v1.85.0
 )
 
